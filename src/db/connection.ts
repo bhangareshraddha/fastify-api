@@ -1,19 +1,26 @@
-// src/db/connection.ts
-import { Sequelize } from 'sequelize';
-import dotenv from 'dotenv';
-
+const { Sequelize } = require('sequelize');
+const dotenv = require('dotenv');
+const fs = require('fs');    
+const path = require('path');
+ 
 dotenv.config();
-    
+ 
 const sequelize = new Sequelize(
-    process.env.DB_NAME as string,
-    process.env.DB_USER as string,
-    process.env.DB_PASSWORD as string,
-    {
-        host: process.env.DB_HOST,
-        port: Number(process.env.DB_PORT) || 3306,
-        dialect: 'mysql',
-        logging: false,
-    }
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT || 4000,
+    dialect: 'mysql',
+    logging: false,
+    dialectOptions: {
+      ssl: {
+        ca: fs.readFileSync(path.join(__dirname, '../ca/ca.pem')),
+        require: true,
+      },
+    },
+  }
 );
-
-export default sequelize;
+ 
+module.exports = sequelize;
